@@ -23,8 +23,10 @@ public class Worker implements Runnable {
                 CommandTask task = queue.poll(1, TimeUnit.SECONDS);
                     try {
                         if(task != null) {
+                            long start = System.nanoTime();
                             task.call();
-                            observers.forEach(o -> o.onTaskSuccess(task));
+                            long duration = System.nanoTime() - start;
+                            notifyCompleted(task, duration / 1_000_000); // ms
                         }
                     } catch (Exception e) {
                         observers.forEach(o -> o.onTaskFailure(task, e));
@@ -42,5 +44,14 @@ public class Worker implements Runnable {
         isRunning = false;
     }
 
+    private void notifyCompleted(CommandTask task, long durationMillis) {
+        for (TaskObserver observer : observers) {
+            if (observer instanceof TimedTaskObserver) {
+                ((TimedTaskObserver) observer).onTaskCompleted(task, durationMillis);
+            } else {
+                observer.onTaskSuccess(task); // fallback nếu không hỗ trợ thời gian
+            }
+        }
+    }
 
 }

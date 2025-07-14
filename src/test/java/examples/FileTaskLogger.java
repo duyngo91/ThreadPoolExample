@@ -5,7 +5,7 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.time.LocalDateTime;
 
-public class FileTaskLogger implements TaskObserver{
+public class FileTaskLogger implements TimedTaskObserver {
     private final String logFile = "target/task-log.txt";
 
     @Override
@@ -26,4 +26,8 @@ public class FileTaskLogger implements TaskObserver{
         }
     }
 
+    @Override
+    public void onTaskCompleted(CommandTask task, long durationMillis) {
+        logToFile("[DONE] " + task.getTaskName() + " | Thời gian: " + durationMillis + "ms");
+    }
 }

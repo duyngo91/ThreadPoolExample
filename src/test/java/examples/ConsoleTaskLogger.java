@@ -1,6 +1,6 @@
 package examples;
 
-public class ConsoleTaskLogger implements TaskObserver{
+public class ConsoleTaskLogger implements TimedTaskObserver{
 
     @Override
     public void onTaskSuccess(CommandTask task) {
@@ -13,4 +13,8 @@ public class ConsoleTaskLogger implements TaskObserver{
     }
 
 
+    @Override
+    public void onTaskCompleted(CommandTask task, long durationMillis) {
+        System.out.println("✅ Task completed: " + task.getTaskName() + " | Time: " + durationMillis + "ms");
+    }
 }
