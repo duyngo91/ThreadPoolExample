@@ -1,8 +1,6 @@
 package examples;
 
-import java.util.concurrent.Callable;
-
-public interface CommandTask extends Callable<Void> {
-
-    String getTaskName();
+public abstract class CommandTask implements Runnable {
+    protected TaskStats stats;
+    abstract String getTaskName();
 }

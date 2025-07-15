@@ -4,16 +4,21 @@ import java.util.List;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.Callable;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicInteger;
 
-public class Worker implements Runnable {
+public class Worker extends CommandTask {
 
     private BlockingQueue<CommandTask> queue;
     private List<TaskObserver> observers;
+
+
+
     private volatile boolean isRunning = true;
 
-    public Worker(BlockingQueue<CommandTask> queue, List<TaskObserver> observers) {
+    public Worker(BlockingQueue<CommandTask> queue, List<TaskObserver> observers, TaskStats stats) {
         this.queue = queue;
         this.observers = observers;
+        this.stats = stats;
     }
 
     @Override
@@ -24,19 +29,22 @@ public class Worker implements Runnable {
                     try {
                         if(task != null) {
                             long start = System.nanoTime();
-                            task.call();
+                            task.run();
                             long duration = System.nanoTime() - start;
                             notifyCompleted(task, duration / 1_000_000); // ms
+                            stats.incrementSuccess();
                         }
                     } catch (Exception e) {
                         observers.forEach(o -> o.onTaskFailure(task, e));
+                        stats.incrementFail();
                         throw new RuntimeException(e);
                     }
             }
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
         }
-        System.out.println(Thread.currentThread().getName() + " stopped.");
+        observers.forEach(o -> o.onFinish(this));
+
     }
 
 
@@ -54,4 +62,8 @@ public class Worker implements Runnable {
         }
     }
 
+    @Override
+    public String getTaskName() {
+        return Thread.currentThread().getName();
+    }
 }

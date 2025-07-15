@@ -15,11 +15,11 @@ public class TaskManager {
 
     public static synchronized void start(){
         executors = Executors.newFixedThreadPool(NUM_WORKER);
-        monitor = new TaskMonitor(queue);
+        monitor = new TaskMonitor(queue, new TaskStats());
         monitor.start();
 
         for(int i = 0 ; i < NUM_WORKER ; i++){
-            Worker w = new Worker(queue, observers);
+            Worker w = new Worker(queue, observers, new TaskStats());
             executors.submit(w);
             workers.add(w);
         }

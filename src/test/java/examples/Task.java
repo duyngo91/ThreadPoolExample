@@ -2,7 +2,7 @@ package examples;
 
 import java.util.Random;
 
-public class Task implements CommandTask {
+public class Task extends CommandTask {
 
     private int id;
 
@@ -12,7 +12,7 @@ public class Task implements CommandTask {
 
 
     @Override
-    public Void call() {
+    public void run() {
         Random random = new Random();
         int randomNumber = random.nextInt(10) + 1;
         try {
@@ -20,11 +20,12 @@ public class Task implements CommandTask {
         } catch (InterruptedException e) {
             throw new RuntimeException(e);
         }
-        return null;
+
     }
 
     @Override
     public String getTaskName() {
         return "Task id : " + id;
     }
+
 }

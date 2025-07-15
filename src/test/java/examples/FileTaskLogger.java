@@ -14,6 +14,11 @@ public class FileTaskLogger implements TimedTaskObserver {
     }
 
     @Override
+    public void onFinish(CommandTask worker) {
+        logToFile(String.format("%s is stopped. %s", worker.getTaskName(), worker.stats.getSummary()));
+    }
+
+    @Override
     public void onTaskFailure(CommandTask task, Exception e) {
         logToFile("[FAILED] " + task.getTaskName() + " – " + e.getMessage());
     }
